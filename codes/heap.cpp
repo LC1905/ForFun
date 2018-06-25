@@ -1,0 +1,97 @@
+// an implementation of max-heap and min-heap
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <math.h>
+using namespace std;
+
+struct mheap{
+	vector<int> heap;
+	char mode[3];
+	int length;
+	int heapsize;
+};
+
+int parent(int i){
+	return (int)(i/2);
+}
+
+int left(int i){
+	return 2*i;
+}
+
+int right(int i){
+	return 2*i+1;
+}
+
+void show_heap(struct mheap* h){
+	for (int i = 0; i < h->heapsize; i++){
+		cout << h->heap[i] << " ";
+	}
+	cout << "\n";
+}
+
+void exchange(struct mheap* h, int i1, int i2){
+	int temp = h->heap[i1];
+	h->heap[i1] = h->heap[i2];
+	h->heap[i2] = temp;
+}
+
+// complexity O(log n)
+void max_heapify(struct mheap* h, int i){  
+	int l = left(i);
+	int r = right(i);
+	int largest = i;
+	if (l < h->heapsize && h->heap[l] > h->heap[largest]){
+		largest = l;
+	}
+	if (r < h->heapsize && h->heap[r] > h->heap[largest]){
+		largest = r;
+	}
+	if (largest != i){
+		exchange(h, largest, i);
+		max_heapify(h, largest);
+	}
+}
+
+// complexity O(n)
+struct mheap* build_heap(vector<int> v, int length, char mode[]){
+	struct mheap* h = new mheap();
+	h->heap = v;
+	h->length = length;
+	h->heapsize = length;
+	int height = (int)(log2(length));
+	if (strcmp(h->mode, "max")){
+		for (int i = pow(2.0, height) - 2; i >= 0; i--){
+			max_heapify(h, i);
+		}
+	}
+	return h;
+}
+
+// complexity O(nlogn)
+vector<int> heapsort(vector<int> v, int length, char mode[]){
+	struct mheap* h = build_heap(v, length, mode);
+	vector<int> ret;
+	for (int i = 0; i < length; i++){
+		int curr = h->heap[0];
+		ret.push_back(curr);
+		h->heap.push_back(curr);
+		h->heap.erase(h->heap.begin());
+		h->heapsize -= 1;
+		if (strcmp(h->mode, "max")){
+			max_heapify(h, 0);
+		}
+	}
+	return ret;
+
+}
+int main(){
+	vector<int> v = {4, 1, 2, 5, 3};
+	vector<int> sort = heapsort(v, v.size(), (char*)"max");
+	for (int i=0; i<sort.size(); i++){
+		cout << sort.at(i) << " ";
+	}
+}
