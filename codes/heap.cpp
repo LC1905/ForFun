@@ -1,4 +1,4 @@
-// an implementation of max-heap and min-heap
+// an implementation of max-heap and min-heap and priority queue
 
 #include <iostream>
 #include <fstream>
@@ -69,7 +69,7 @@ void min_heapify(struct mheap* h, int i){
 	}
 	if (smallest != i){
 		exchange(h, smallest, i);
-		max_heapify(h, smallest);
+		min_heapify(h, smallest);
 	}
 }
 
@@ -95,14 +95,12 @@ struct mheap* build_heap(vector<int> v, int length, char mode[]){
 }
 
 // complexity O(nlogn)
-vector<int> heapsort(vector<int> v, int length, char mode[]){
+struct mheap* heapsort(vector<int> v, int length, char mode[]){
 	struct mheap* h = build_heap(v, length, mode);
+	show_heap(h);
 	vector<int> ret;
-	for (int i = 0; i < length; i++){
-		int curr = h->heap[0];
-		ret.push_back(curr);
-		h->heap.push_back(curr);
-		h->heap.erase(h->heap.begin());
+	for (int i = length-1; i >= 0; i--){
+		exchange(h, 0, i);
 		h->heapsize -= 1;
 		if (strcmp(h->mode, "max") == 0){
 			max_heapify(h, 0);
@@ -111,13 +109,11 @@ vector<int> heapsort(vector<int> v, int length, char mode[]){
 			min_heapify(h, 0);
 		}
 	}
-	return ret;
-
+	h->heapsize = length;
+	return h;
 }
 int main(){
 	vector<int> v = {4, 1, 2, 5, 3};
-	vector<int> sort = heapsort(v, v.size(), (char*)"max");
-	for (int i=0; i<sort.size(); i++){
-		cout << sort.at(i) << " ";
-	}
+	struct mheap* h = heapsort(v, v.size(), (char*)"min");
+	show_heap(h);
 }
