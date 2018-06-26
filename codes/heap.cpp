@@ -112,8 +112,79 @@ struct mheap* heapsort(vector<int> v, int length, char mode[]){
 	h->heapsize = length;
 	return h;
 }
+
+
+// Add some extra features to the data struct to implement a priority queue
+
+int heap_minmax(struct mheap* h){
+	return h->heap.at(0);
+}
+
+// complexity O(logn)
+int extract_heap_minmax(struct mheap* h){
+	if (h->heapsize < 1){
+		cerr << "heap is empty!\n";
+	}
+	int ret = h->heap.at(0);
+	exchange(h, 0, h->heapsize-1);
+	h->heapsize -= 1;
+	if (strcmp(h->mode, "max") == 0){
+		max_heapify(h, 0);
+	}
+	else if (strcmp(h->mode, "min") == 0){
+		min_heapify(h, 0);
+	}
+	return ret;
+}
+
+void heap_update_key(struct mheap* h, int i, int key){
+	if (strcmp(h->mode, "max") == 0){
+		if (key < h->heap.at(i)){
+			cerr << "key should increase\n";
+			return;
+		}
+		h->heap[i] = key;
+		while (i > 0 && h->heap[i] > h->heap[parent(i)]){
+			exchange(h, i, parent(i));
+			i = parent(i);
+		}
+	}
+	if (strcmp(h->mode, "min") == 0){
+		if (key > h->heap.at(i)){
+			cerr << "key should decrease\n";
+			return;
+		}
+		h->heap[i] = key;
+		while (i > 0 && h->heap[i] < h->heap[parent(i)]){
+			exchange(h, i, parent(i));
+			i = parent(i);
+		}
+	}
+}
+
+void heap_insert_key(struct mheap* h, int key){
+	h->heapsize += 1;
+	if (strcmp(h->mode, "max") == 0){
+		h->heap.push_back(-10000000);
+	}
+	else if (strcmp(h->mode, "min") == 0){
+		h->heap.push_back(10000000);
+	}
+	heap_update_key(h, h->heapsize-1, key);
+}
+
+
 int main(){
 	vector<int> v = {4, 1, 2, 5, 3};
-	struct mheap* h = heapsort(v, v.size(), (char*)"min");
+	//struct mheap* h = heapsort(v, v.size(), (char*)"min");
+	//show_heap(h);
+	struct mheap* h = build_heap(v, v.size(), (char*)"max");
+	show_heap(h);
+	//while (h->heapsize >= 1){
+		//cout << extract_heap_minmax(h) << "\n";
+	//}
+	heap_update_key(h, 2, 8);
+	show_heap(h);
+	heap_insert_key(h, 10);
 	show_heap(h);
 }
