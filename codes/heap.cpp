@@ -56,16 +56,39 @@ void max_heapify(struct mheap* h, int i){
 	}
 }
 
+// complexity O(log n)
+void min_heapify(struct mheap* h, int i){  
+	int l = left(i);
+	int r = right(i);
+	int smallest = i;
+	if (l < h->heapsize && h->heap[l] < h->heap[smallest]){
+		smallest = l;
+	}
+	if (r < h->heapsize && h->heap[r] < h->heap[smallest]){
+		smallest = r;
+	}
+	if (smallest != i){
+		exchange(h, smallest, i);
+		max_heapify(h, smallest);
+	}
+}
+
 // complexity O(n)
 struct mheap* build_heap(vector<int> v, int length, char mode[]){
 	struct mheap* h = new mheap();
 	h->heap = v;
 	h->length = length;
 	h->heapsize = length;
+	strcpy(h->mode, mode);
 	int height = (int)(log2(length));
-	if (strcmp(h->mode, "max")){
+	if (strcmp(h->mode, "max") == 0){
 		for (int i = pow(2.0, height) - 2; i >= 0; i--){
 			max_heapify(h, i);
+		}
+	}
+	else if (strcmp(h->mode, "min") == 0){
+		for (int i = pow(2.0, height) - 2; i >= 0; i--){
+			min_heapify(h, i);
 		}
 	}
 	return h;
@@ -81,8 +104,11 @@ vector<int> heapsort(vector<int> v, int length, char mode[]){
 		h->heap.push_back(curr);
 		h->heap.erase(h->heap.begin());
 		h->heapsize -= 1;
-		if (strcmp(h->mode, "max")){
+		if (strcmp(h->mode, "max") == 0){
 			max_heapify(h, 0);
+		}
+		else if (strcmp(h->mode, "min") == 0){
+			min_heapify(h, 0);
 		}
 	}
 	return ret;
